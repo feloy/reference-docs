@@ -18,11 +18,12 @@ package api
 
 import (
 	"fmt"
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"path/filepath"
 	"sort"
 	"strings"
+
+	"gopkg.in/yaml.v2"
 
 	"github.com/go-openapi/loads"
 	"github.com/go-openapi/spec"
@@ -31,11 +32,11 @@ import (
 // inlineDefinition is a definition that should be inlined when displaying a Concept
 // instead of appearing the in "Definitions"
 type inlineDefinition struct {
-	Name string
+	Name  string
 	Match string
 }
 
-var _INLINE_DEFINITIONS = []inlineDefinition {
+var _INLINE_DEFINITIONS = []inlineDefinition{
 	{Name: "Spec", Match: "${resource}Spec"},
 	{Name: "Status", Match: "${resource}Status"},
 	{Name: "List", Match: "${resource}List"},
@@ -47,7 +48,7 @@ var _INLINE_DEFINITIONS = []inlineDefinition {
 
 func NewDefinitions(specs []*loads.Document) Definitions {
 	s := Definitions{
-		All:	map[string]*Definition{},
+		All:    map[string]*Definition{},
 		ByKind: map[string]SortDefinitionsByVersion{},
 	}
 
@@ -100,7 +101,7 @@ func (s *Definitions) initialize() {
 		defs := s.ByKind[d.Name]
 		others := []*Definition{}
 		for _, def := range defs {
-			if def.Version != d.Version {
+			if def.Version != d.Version && def.Group != d.Group {
 				others = append(others, def)
 			}
 		}
@@ -115,7 +116,7 @@ func (s *Definitions) initialize() {
 		}
 	}
 
-	// Initialize Inline, IsInlined 
+	// Initialize Inline, IsInlined
 	// Note: examples of inline definitions are "Spec", "Status", "List", etc
 	for _, d := range s.All {
 		for _, name := range s.getInlineDefinitionNames(d.Name) {
@@ -274,7 +275,7 @@ func (d *Definition) GetResourceName() string {
 }
 
 func (d *Definition) initExample(config *Config) {
-	path := filepath.Join(*ConfigDir, config.ExampleLocation, d.Name, d.Name + ".yaml")
+	path := filepath.Join(*ConfigDir, config.ExampleLocation, d.Name, d.Name+".yaml")
 	file := strings.Replace(strings.ToLower(path), " ", "_", -1)
 	content, err := ioutil.ReadFile(file)
 	if err != nil || len(content) <= 0 {

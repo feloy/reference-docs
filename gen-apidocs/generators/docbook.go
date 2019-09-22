@@ -139,7 +139,9 @@ func (h *DocbookWriter) WriteResource(r *api.Resource) {
 		fmt.Fprintf(w, "<note><para>%s</para></note>\n", a2link(r.DescriptionNote))
 	}
 
-	h.writeOtherVersions(w, r.Definition)
+	if h.Config.OldVersions {
+		h.writeOtherVersions(w, r.Definition)
+	}
 	h.writeAppearsIn(w, r.Definition)
 	h.writeFields(w, r.Definition)
 
@@ -253,7 +255,9 @@ func (h *DocbookWriter) WriteDefinition(d *api.Definition) {
 	fmt.Fprintf(f, "</tbody></tgroup>\n</informaltable>\n")
 
 	fmt.Fprintf(f, "<para>%s</para>\n", d.DescriptionWithEntities)
-	h.writeOtherVersions(f, d)
+	if h.Config.OldVersions {
+		h.writeOtherVersions(f, d)
+	}
 	h.writeAppearsIn(f, d)
 	h.writeFields(f, d)
 
@@ -298,10 +302,19 @@ func (h *DocbookWriter) writeOtherVersions(w io.Writer, d *api.Definition) {
 }
 
 func (h *DocbookWriter) writeAppearsIn(w io.Writer, d *api.Definition) {
-	if d.AppearsIn.Len() != 0 {
+	found := false
+	for _, a := range d.AppearsIn {
+		if !a.IsOldVersion {
+			found = true
+			break
+		}
+	}
+	if found {
 		fmt.Fprintf(w, "<note><para> Appears In: <itemizedlist>\n")
 		for _, a := range d.AppearsIn {
-			fmt.Fprintf(w, "  <listitem><para>%s</para></listitem>\n", a2link(a.FullHrefLink()))
+			if !a.IsOldVersion {
+				fmt.Fprintf(w, "  <listitem><para>%s</para></listitem>\n", a2link(a.FullHrefLink()))
+			}
 		}
 		fmt.Fprintf(w, " </itemizedlist>\n</para></note>\n")
 	}

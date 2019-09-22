@@ -30,18 +30,6 @@ resource_categories:
       version: v1
       group: core
       description_warning: "Containers are only ever created within the context of a <a href=\"#pod-v1-core\">Pod</a>.  This is usually done using a Controller.  See Controllers: <a href=\"#deployment-v1-apps\">Deployment</a>, <a href=\"#job-v1-batch\">Job</a>, or <a href=\"#statefulset-v1-apps\">StatefulSet</a>"
-    - name: CronJob
-      version: v1beta1
-      group: batch
-    - name: DaemonSet
-      version: v1
-      group: apps
-    - name: Deployment
-      version: v1
-      group: apps
-    - name: Job
-      version: v1
-      group: batch
     - name: Pod
       version: v1
       group: core
@@ -50,16 +38,31 @@ resource_categories:
       version: v1
       group: apps
       description_warning: "In many cases it is recommended to create a <a href=\"#deployment-v1-apps\">Deployment</a> instead of ReplicaSet."
+    - name: Deployment
+      version: v1
+      group: apps
+    - name: StatefulSet
+      version: v1
+      group: apps
+    - name: Job
+      version: v1
+      group: batch
+    - name: CronJob
+      version: v1beta1
+      group: batch
+    - name: DaemonSet
+      version: v1
+      group: apps
     - name: ReplicationController
       version: v1
       group: core
       description_warning: "In many cases it is recommended to create a <a href=\"#deployment-v1-apps\">Deployment</a> instead of a ReplicationController."
-    - name: StatefulSet
-      version: v1
-      group: apps
   - name: "Service APIs"
     include: "servicediscovery"
     resources:
+    - name: Service
+      version: v1
+      group: core
     - name: Endpoints
       version: v1
       group: core
@@ -69,22 +72,16 @@ resource_categories:
     - name: Ingress
       version: v1beta1
       group: networking
-    - name: Service
-      version: v1
-      group: core
   - name: "Config and Storage APIs"
     include: "config"
     resources:
     - name: ConfigMap
       version: v1
       group: core
-    - name: CSIDriver
-      version: v1beta1
-      group: storage
-    - name: CSINode
-      version: v1beta1
-      group: storage
     - name: Secret
+      version: v1
+      group: core
+    - name: Volume
       version: v1
       group: core
     - name: PersistentVolumeClaim
@@ -94,11 +91,14 @@ resource_categories:
     - name: StorageClass
       version: v1
       group: storage
-    - name: Volume
-      version: v1
-      group: core
     - name: VolumeAttachment
       version: v1
+      group: storage
+    - name: CSIDriver
+      version: v1beta1
+      group: storage
+    - name: CSINode
+      version: v1beta1
       group: storage
   - name: "Metadata APIs"
     include: "meta"

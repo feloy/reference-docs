@@ -66,6 +66,7 @@ func (a ApiGroups) Less(i, j int) bool {
 }
 
 type ApiKind string
+
 func (k ApiKind) String() string {
 	return string(k)
 }
@@ -144,7 +145,7 @@ func (a SortDefinitionsByVersion) Less(i, j int) bool {
 		return a[i].Version.LessThan(a[j].Version)
 	}
 
-	return a[i].Group.LessThan(a[j].Group)
+	return a[i].Version.LessThan(a[j].Version)
 }
 
 type Definition struct {
@@ -210,6 +211,7 @@ type Config struct {
 	Operations  Operations
 	SpecTitle   string
 	SpecVersion string
+	OldVersions bool
 }
 
 type Field struct {

@@ -46,9 +46,13 @@ type DocWriter interface {
 var Backend = flag.String("backend", "go",
 	"Specify the backend to use for doc generation. Valid options are 'brodocs', 'go', 'docbook'.")
 
+var OldVersions = flag.Bool("old-versions", true, "True to include old versions into the documentation")
+
 func GenerateFiles() {
 	// Load the yaml config
 	config := api.NewConfig()
+	config.OldVersions = *OldVersions
+
 	PrintInfo(config)
 	ensureIncludeDir()
 
@@ -102,24 +106,25 @@ func GenerateFiles() {
 		writer.WriteDefinition(d)
 	}
 
-	writer.WriteOldVersionsOverview()
-	oldversions := api.SortDefinitionsByName{}
-	for _, d := range config.Definitions.All {
-		// Don't add definitions for top level resources in the toc or inlined resources
-		if d.IsOldVersion {
-			oldversions = append(oldversions, d)
+	if *OldVersions {
+		writer.WriteOldVersionsOverview()
+		oldversions := api.SortDefinitionsByName{}
+		for _, d := range config.Definitions.All {
+			// Don't add definitions for top level resources in the toc or inlined resources
+			if d.IsOldVersion {
+				oldversions = append(oldversions, d)
+			}
+		}
+		sort.Sort(oldversions)
+		for _, d := range oldversions {
+			// Skip Inlined definitions
+			if d.IsInlined {
+				continue
+			}
+			r := &api.Resource{Definition: d, Name: d.Name}
+			writer.WriteResource(r)
 		}
 	}
-	sort.Sort(oldversions)
-	for _, d := range oldversions {
-		// Skip Inlined definitions
-		if d.IsInlined {
-			continue
-		}
-		r := &api.Resource{Definition: d, Name: d.Name}
-		writer.WriteResource(r)
-	}
-
 	writer.Finalize()
 }
 
