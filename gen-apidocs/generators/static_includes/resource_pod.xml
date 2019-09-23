@@ -1,0 +1,67 @@
+<para>Here is a classification of the PodSpec fields.</para>
+
+<itemizedlist>
+    <listitem>
+        <para><emphasis>Containers</emphasis> fields will define and parameterize
+            more precisely each container of the Pod, whether it is a normal
+            container (*containers*) or an init container (*initContainers*).
+            The *imagePullSecrets* parameter will help to download containers
+            images from private registries. The *enableServiceLinks* field
+            will indicate if environment variables for services should be
+            injected in the pod's containers.
+        </para>
+    </listitem>
+    <listitem>
+        <para><emphasis>Volumes</emphasis> field (*volumes*) will define a
+            list of volumes that containers will be able to mount and share.
+        </para>
+    </listitem>
+    <listitem>
+        <para><emphasis>Scheduling</emphasis> fields will help you define the
+            most appropriate Node to deploy the Pod, by selecting nodes by labels
+            (*nodeSelector*), directly specifying a node name (*nodeName*),
+            using *affinity* and *tolerations*, by selecting a specific scheduler
+            (*schedulerName*), and by requiring a specific runtime class
+            (*runtimeClassName*). They will also be used to prioritize a Pod
+            over other Pods (*priorityClassName* and *priority*).
+        </para>
+    </listitem>
+    <listitem>
+        <para><emphasis>Lifecycle</emphasis> fields will help define if a Pod
+            should restart after termination (*restartPolicy*) and fine-tune
+            the periods after which processes running in the containers of a
+            terminating pod are killed (*terminationGracePeriodSeconds*) or
+            after which a running Pod will be stopped if not yet terminated
+            (*activeDeadlineSeconds*). They also help define readiness of a
+            pod (*readinessGates*).
+        </para>
+    </listitem>
+    <listitem>
+        <para><emphasis>Hostname and Name resolution</emphasis> fields will
+            help define the hostname (*hostname*) and part of the FQDN
+            (*subdomain*) of the Pod, add hosts in the /etc/hosts files of
+            the containers (*hostAliases*), fine-tune the /etc/resolv.conf
+            files of the containers (*dnsConfig*) and define a policy for the
+            DNS configuration (*dnsPolicy*).</para>
+    </listitem>
+    <listitem>
+        <para><emphasis>Host namespaces</emphasis> fields will help indicate
+            if the Pod must use host namespaces for network (*hostNetwork*),
+            PIDs (*hostPID*), IPC (*hostIPC*) and if containers will share the
+            same (non-host) process namespace (*shareProcessNamespace*).
+        </para>
+    </listitem>
+    <listitem>
+        <para><emphasis>Service account</emphasis> fields will be useful to give
+            specific rights to a Pod, by affecting it a specific service account
+            (*serviceAccountName*) or by disabling the automount of the default
+            service account with *automountServiceAccountToken*.
+        </para>
+    </listitem>
+    <listitem>
+        <para><emphasis>Security Context</emphasis> field (*securityContext*)
+            helps define various security attributes and common container
+            settings at the pod level.
+        </para>
+    </listitem>
+</itemizedlist>

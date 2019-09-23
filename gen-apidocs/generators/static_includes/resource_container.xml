@@ -1,0 +1,72 @@
+<para>We can separate container fields in two parts. The first part are
+    fields that are related to the container runtime (image, entrypoint,
+    ports, environment variables and volumes), the second part are fields
+    that will be handled by the Kubernetes system.</para>
+
+<para>The fields related to container runtime are:
+<itemizedlist>
+    <listitem>
+        <para><emphasis>Image</emphasis> fields define the image of the container
+            (*image*) and the policy to pull the image (*imagePullPolicy*).
+        </para>
+    </listitem>
+    <listitem>
+        <para><emphasis>Entrypoint</emphasis> fields define the command (*command*)
+            and arguments (*args*) of the entrypoint and its working directory
+            (*workingDir*).
+        </para>
+    </listitem>
+    <listitem>
+        <para><emphasis>Ports</emphasis> field (*ports*) defines the list of
+            ports to expose from the container.
+        </para>
+    </listitem>
+    <listitem>
+        <para><emphasis>Environment variables</emphasis> fields help define the
+            environment variables that will be exported in the container, either
+            directly (*env*) or by referencing ConfigMap or Secret values (*envFrom*).
+        </para>
+    </listitem>
+    <listitem>
+        <para><emphasis>Volumes</emphasis> fields define the volumes to mount
+            into the container, whether they are a filesystem volume
+            (*volumeMounts*) or a raw block volume (*volumeDevices*).
+        </para>
+    </listitem>
+</itemizedlist>
+</para>
+
+<para>The fields related to Kubernetes are:
+<itemizedlist>
+    <listitem>
+        <para><emphasis>Name</emphasis> field (*name*) uniquely identifies
+            each container in a pod.
+        </para>
+    </listitem>
+    <listitem>
+        <para><emphasis>Resources</emphasis> field (*resources*) helps define
+            the resource requirements and limits for a container.
+        </para>
+    </listitem>
+    <listitem>
+        <para><emphasis>Lifecycle</emphasis> fields help define handlers on
+            lifecycle events (*lifecycle*), parameterize the termination message
+            (*terminationMessagePath* and *terminationMessagePolicy*), and
+            define probes to check liveness (*livenessProbe*) and readiness
+            (*readinessProbe*) of the container.
+        </para>
+    </listitem>
+    <listitem>
+        <para><emphasis>Security Context</emphasis> field (*securityContext*)
+            helps define various security attributes and common container
+            settings at the container level.
+        </para>
+    </listitem>
+    <listitem>
+        <para><emphasis>Debugging</emphasis> fields are very specialized
+            parameters, mostly for debugging purposes
+            (*stdin*, *stdinOnce* and *tty*).
+        </para>
+    </listitem>
+</itemizedlist>
+</para>

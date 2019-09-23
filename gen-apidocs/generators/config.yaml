@@ -26,18 +26,134 @@ resource_categories:
   - name: "Workloads APIs"
     include: "workloads"
     resources:
-    - name: Container
-      version: v1
-      group: core
-      description_warning: "Containers are only ever created within the context of a <a href=\"#pod-v1-core\">Pod</a>.  This is usually done using a Controller.  See Controllers: <a href=\"#deployment-v1-apps\">Deployment</a>, <a href=\"#job-v1-batch\">Job</a>, or <a href=\"#statefulset-v1-apps\">StatefulSet</a>"
     - name: Pod
       version: v1
       group: core
-      description_warning: "It is recommended that users create Pods only through a Controller, and not directly.  See Controllers: <a href=\"#deployment-v1-apps\">Deployment</a>, <a href=\"#job-v1-batch\">Job</a>, or <a href=\"#statefulset-v1-apps\">StatefulSet</a>."
+      include: 
+        definition: PodSpec
+        file: "pod"
+      categories:
+        definition: PodSpec
+        list:
+        - name: Containers
+          fields:
+          - containers
+          - initContainers
+          - imagePullSecrets
+          - enableServiceLinks
+        - name: Volumes
+          fields:
+          - volumes
+        - name: Scheduling
+          fields:
+          - nodeSelector
+          - nodeName
+          - affinity
+          - tolerations
+          - schedulerName
+          - runtimeClassName
+          - priorityClassName
+          - priority
+        - name: Lifecycle
+          fields:
+          - restartPolicy
+          - terminationGracePeriodSeconds
+          - activeDeadlineSeconds
+          - readinessGates
+        - name: Hostname and Name resolution
+          fields:
+          - hostname
+          - subdomain
+          - hostAliases
+          - dnsConfig
+          - dnsPolicy
+        - name: Hosts namespaces
+          fields:
+          - hostNetwork
+          - hostPID
+          - hostIPC
+          - shareProcessNamespace
+        - name: Service account
+          fields:
+          - serviceAccountName
+          - automountServiceAccountToken
+        - name: Security context
+          fields:
+          - securityContext
+        - name: Alpha level
+          fields:
+          - ephemeralContainers
+          - overhead
+          - preemptionPolicy
+          - topologySpreadConstraints
+        - name: Deprecated
+          fields:
+          - serviceAccount
+    - name: Container
+      version: v1
+      group: core
+      include:
+        file: "container"
+      categories:
+        list:
+        - name: Image
+          fields:
+          - image
+          - imagePullPolicy
+        - name: Entrypoint
+          fields:
+          - command
+          - args
+          - workingDir
+        - name: Ports
+          fields:
+          - ports
+        - name: Environment variables
+          fields:
+          - env
+          - envFrom
+        - name: Volumes
+          fields:
+          - volumeMounts
+          - volumeDevices
+        - name: Name
+          fields:
+          - name
+        - name: Resources
+          fields:
+          - resources
+        - name: Lifecycle
+          fields:
+          - lifecycle
+          - terminationMessagePath
+          - terminationMessagePolicy
+          - livenessProbe
+          - readinessProbe
+        - name: Security Context
+          fields:
+          - securityContext
+        - name: Debugging
+          fields:
+          - stdin
+          - stdinOnce
+          - tty
+        - name: Alpha level
+          fields:
+          - startupProbe
     - name: ReplicaSet
       version: v1
       group: apps
-      description_warning: "In many cases it is recommended to create a <a href=\"#deployment-v1-apps\">Deployment</a> instead of ReplicaSet."
+      include:
+        definition: ReplicaSetSpec
+        file: "replicaset"
+      categories:
+        definition: ReplicaSetSpec
+        list:
+        - fields:
+          - replicas
+          - selector
+          - template
+          - minReadySeconds
     - name: Deployment
       version: v1
       group: apps
@@ -53,10 +169,6 @@ resource_categories:
     - name: DaemonSet
       version: v1
       group: apps
-    - name: ReplicationController
-      version: v1
-      group: core
-      description_warning: "In many cases it is recommended to create a <a href=\"#deployment-v1-apps\">Deployment</a> instead of a ReplicationController."
   - name: "Service APIs"
     include: "servicediscovery"
     resources:

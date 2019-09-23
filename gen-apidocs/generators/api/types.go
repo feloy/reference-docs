@@ -316,6 +316,11 @@ type EmptyExample struct{}
 type CurlExample struct{}
 type KubectlExample struct{}
 
+type FieldsCategory struct {
+	Name   *string
+	Fields []string
+}
+
 type Resource struct {
 	// Name is the display name of this Resource
 	Name    string `yaml:",omitempty"`
@@ -330,6 +335,15 @@ type Resource struct {
 	ConceptGuide string `yaml:"concept_guide,omitempty"`
 	// RelatedTasks is as list of tasks related to this concept
 	RelatedTasks []string `yaml:"related_tasks,omitempty"`
+	// Include is the name of the _<resource>.html file to include in the index.html
+	Include *struct {
+		Definition *string `yaml:",omitempty"`
+		File       string
+	} `yaml:",omitempty"`
+	Categories *struct {
+		Definition *string `yaml:",omitempty"`
+		List       []FieldsCategory
+	} `yaml:",omitempty"`
 
 	// Definition of the object
 	Definition *Definition

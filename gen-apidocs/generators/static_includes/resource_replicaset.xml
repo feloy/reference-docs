@@ -1,0 +1,25 @@
+<para>The ReplicaSet controller perpetually watches the Pods with the labels
+    specified with *selector*. At any given time, if the number of actual running
+    Pods with these labels:
+<itemizedlist>
+    <listitem><para>is greater than the requested *replicas*, some Pods will be
+        terminated to satisfy the number of replicas. Note that the terminated
+        Pods are not necessarily Pods that were created by the ReplicaSet
+        controller.</para></listitem>
+    <listitem><para>is lower than the requested *replicas*, new Pods will be
+        created with the specified Pod *template* to satisfy the number of
+        replicas. Note that to avoid the ReplicaSet controller to create Pods
+        in a loop, the specified Template must create a Pod selectable by the
+        specified Selector.</para></listitem>
+</itemizedlist></para>
+
+<para>Note that:
+<itemizedlist>
+    <listitem><para>the *selector* field of a ReplicaSet is immutable,
+        </para></listitem>
+    <listitem><para>changing the *template* of a ReplicaSet will not have
+        an immediate effect. It will affect the Pods that will be created
+        after this change,</para></listitem>
+    <listitem><para>changing the *replicas* field will immediately trigger
+        the creation or termination of Pods.</para></listitem>
+</itemizedlist></para>

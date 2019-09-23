@@ -23,6 +23,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"time"
 
@@ -143,14 +144,42 @@ func (h *DocbookWriter) WriteResource(r *api.Resource) {
 		h.writeOtherVersions(w, r.Definition)
 	}
 	h.writeAppearsIn(w, r.Definition)
-	h.writeFields(w, r.Definition)
+
+	if r.Include != nil && r.Include.Definition == nil {
+		field := regexp.MustCompile(`\*([A-Za-z0-9]+)\*`)
+		content, err := ioutil.ReadFile(filepath.Join(*api.ConfigDir, "static_includes", "resource_"+r.Include.File+".xml"))
+		if err == nil {
+			replace := fmt.Sprintf("<link linkend=\"field-%s-%s-%s-$1\"><systemitem>$1</systemitem></link>", r.Definition.Name, r.Definition.Version, r.Definition.Group)
+			fmt.Fprintf(w, "%s", field.ReplaceAllString(string(content), replace))
+		}
+	}
+
+	if r.Categories != nil && r.Categories.Definition == nil {
+		h.writeCategoriesFields(w, r.Definition, r)
+	} else {
+		h.writeFields(w, r.Definition)
+	}
 
 	// Inline
 	if r.Definition.Inline.Len() > 0 {
 		for _, d := range r.Definition.Inline {
 			fmt.Fprintf(w, "<sect1 id=\"%s\"><title>%s %s %s</title>\n", d.LinkID(), d.Name, d.Version, d.Group)
 			h.writeAppearsIn(w, d)
-			h.writeFields(w, d)
+
+			if r.Include != nil && r.Include.Definition != nil && d.Name == *r.Include.Definition {
+				field := regexp.MustCompile(`\*([A-Za-z0-9]+)\*`)
+				content, err := ioutil.ReadFile(filepath.Join(*api.ConfigDir, "static_includes", "resource_"+r.Include.File+".xml"))
+				if err == nil {
+					replace := fmt.Sprintf("<link linkend=\"field-%s-%s-%s-$1\"><systemitem>$1</systemitem></link>", d.Name, d.Version, d.Group)
+					fmt.Fprintf(w, "%s", field.ReplaceAllString(string(content), replace))
+				}
+			}
+
+			if r.Categories != nil && r.Categories.Definition != nil && d.Name == *r.Categories.Definition {
+				h.writeCategoriesFields(w, d, r)
+			} else {
+				h.writeFields(w, d)
+			}
 			fmt.Fprintf(w, "</sect1>")
 		}
 	}
@@ -165,7 +194,7 @@ func (h *DocbookWriter) WriteResource(r *api.Resource) {
 	h.CurrentSection.SubSections = append(h.CurrentSection.SubSections, &item)
 
 	// Operations
-	if len(r.Definition.OperationCategories) == 0 {
+	if len(r.Definition.OperationCategories) == 0 || !h.Config.OldVersions {
 		return
 	}
 
@@ -327,22 +356,65 @@ func (h *DocbookWriter) writeFields(w io.Writer, d *api.Definition) {
 	fmt.Fprintf(w, "<variablelist>\n")
 
 	for _, field := range d.Fields {
-		fmt.Fprintf(w, "<varlistentry><term>%s", field.Name)
-
-		if field.Link() != "" {
-			fmt.Fprintf(w, " (<emphasis>%s</emphasis>)", a2link(field.FullLink()))
-		}
-		fmt.Fprintf(w, "</term><listitem>")
-
-		if field.PatchStrategy != "" {
-			fmt.Fprintf(w, "<para>patch strategy: %s</para>", field.PatchStrategy)
-		}
-		if field.PatchMergeKey != "" {
-			fmt.Fprintf(w, "<para>patch merge key: %s</para>", field.PatchMergeKey)
-		}
-		fmt.Fprintf(w, "<para>%s</para></listitem></varlistentry>\n", field.DescriptionWithEntities)
+		h.writeField(w, d, field)
 	}
 	fmt.Fprintf(w, "</variablelist>\n")
+}
+
+func (h *DocbookWriter) writeCategoriesFields(w io.Writer, d *api.Definition, r *api.Resource) {
+	allWritten := map[string]struct{}{}
+	for _, cat := range r.Categories.List {
+		if cat.Name != nil {
+			fmt.Fprintf(w, "<bridgehead>%s</bridgehead>", *cat.Name)
+		}
+		fmt.Fprintf(w, "<variablelist>\n")
+		for _, fieldName := range cat.Fields {
+			found := false
+			for _, field := range d.Fields {
+				if field.Name == fieldName {
+					h.writeField(w, d, field)
+					allWritten[fieldName] = struct{}{}
+					found = true
+				}
+			}
+			if !found {
+				panic("Field not found: " + fieldName)
+			}
+		}
+		fmt.Fprintf(w, "</variablelist>\n")
+	}
+	first := true
+	for _, field := range d.Fields {
+		if _, written := allWritten[field.Name]; !written {
+			if first {
+				fmt.Fprintf(w, "<bridgehead>Others</bridgehead>")
+				fmt.Fprintf(w, "<variablelist>\n")
+				first = false
+			}
+			h.writeField(w, d, field)
+		}
+	}
+	if !first {
+		fmt.Fprintf(w, "</variablelist>\n")
+	}
+}
+
+func (h *DocbookWriter) writeField(w io.Writer, d *api.Definition, field *api.Field) {
+	fieldID := fmt.Sprintf("field-%s-%s-%s-%s", d.Name, d.Version, d.Group, field.Name)
+	fmt.Fprintf(w, "<varlistentry id=\"%s\"><term>%s", fieldID, field.Name)
+
+	if field.Link() != "" {
+		fmt.Fprintf(w, " (<emphasis>%s</emphasis>)", a2link(field.FullLink()))
+	}
+	fmt.Fprintf(w, "</term><listitem>")
+
+	if field.PatchStrategy != "" {
+		fmt.Fprintf(w, "<para>patch strategy: %s</para>", field.PatchStrategy)
+	}
+	if field.PatchMergeKey != "" {
+		fmt.Fprintf(w, "<para>patch merge key: %s</para>", field.PatchMergeKey)
+	}
+	fmt.Fprintf(w, "<para>%s</para></listitem></varlistentry>\n", field.DescriptionWithEntities)
 }
 
 func (h *DocbookWriter) Finalize() {
