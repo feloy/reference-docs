@@ -1,5 +1,12 @@
-note: Container Config to run nginx (must be embedded in a PodSpec to run).
+note: Container printing "Hello World".
 sample: |
-  name: nginx
-  # Run the nginx:1.10 image
-  image: nginx:1.10
+  apiVersion: v1
+  kind: Pod
+  metadata:
+    name: pod-example
+  spec:
+    containers:
+    - name: ubuntu
+      image: ubuntu:trusty
+      command: ["echo"]
+      args: ["Hello World"]

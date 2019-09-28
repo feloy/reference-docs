@@ -93,6 +93,7 @@ resource_categories:
     - name: Container
       version: v1
       group: core
+      goimport: "k8s.io/api/core/v1"
       include:
         file: "container"
       categories:

@@ -131,6 +131,7 @@ func (h *DocbookWriter) WriteResource(r *api.Resource) {
 		r.Definition.GroupDisplayName(), r.Definition.Version.String(), r.Name)
 	fmt.Fprintf(w, "</tbody></tgroup>\n</informaltable>\n")
 
+	h.writeGoImport(w, r)
 	h.writeSample(w, r.Definition)
 
 	if r.DescriptionWarning != "" {
@@ -432,12 +433,22 @@ func (h *DocbookWriter) writeSample(w io.Writer, d *api.Definition) {
 
 	note := d.Sample.Note
 	for _, s := range d.GetSamples() {
-		if s.Type == "bdocs-tab:example_go" && s.Text != "" {
-			fmt.Fprintf(w, "<example><title>%s</title><programlisting language=\"go\">%s</programlisting></example>\n\n", note, strings.TrimSpace(html.EscapeString(s.Text)))
+		if s.Type == "bdocs-tab:example_go" {
+			if s.Text != "" {
+				fmt.Fprintf(w, "<example><title>%s</title><programlisting language=\"go\">%s</programlisting></example>\n\n", note, strings.TrimSpace(html.EscapeString(s.Text)))
+			}
 		} else {
 			fmt.Fprintf(w, "<example><title>%s</title><programlisting language=\"shell\">cat &lt;&lt;EOF | kubectl apply -f -\n%s\nEOF</programlisting></example>\n\n", note, strings.TrimSpace(html.EscapeString(s.Text)))
 		}
 	}
+}
+
+func (h *DocbookWriter) writeGoImport(w io.Writer, r *api.Resource) {
+	if r.GoImport == nil {
+		return
+	}
+
+	fmt.Fprintf(w, "<synopsis><programlisting language=\"go\">import \"%s\"</programlisting></synopsis>\n", *r.GoImport)
 }
 
 func (h *DocbookWriter) writeOperationSample(w io.Writer, req bool, op string, examples []api.ExampleText) {
