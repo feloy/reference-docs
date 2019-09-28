@@ -28,11 +28,13 @@ var ExampleProviders = []ExampleProvider{
 
 var EmptyExampleProviders = []ExampleProvider{
 	EmptyExample{},
+	GoExample{},
 }
 
 var _ ExampleProvider = &EmptyExample{}
 var _ ExampleProvider = &CurlExample{}
 var _ ExampleProvider = &KubectlExample{}
+var _ ExampleProvider = &GoExample{}
 
 func GetExampleProviders() []ExampleProvider {
 	if *BuildOps {
@@ -247,5 +249,41 @@ func (ke KubectlExample) GetResponse(o *Operation) string {
 	case "Watch":
 		return string(j)
 	}
+	return ""
+}
+
+func (ge GoExample) GetSample(d *Definition) string {
+	return d.Sample.GoSample
+}
+
+func (ge GoExample) GetRequestMessage() string {
+	return ""
+}
+
+func (ge GoExample) GetResponseMessage() string {
+	return ""
+}
+
+func (ge GoExample) GetTab() string {
+	return ""
+}
+
+func (ge GoExample) GetRequestType() string {
+	return ""
+}
+
+func (ge GoExample) GetResponseType() string {
+	return ""
+}
+
+func (ge GoExample) GetSampleType() string {
+	return "bdocs-tab:example_go"
+}
+
+func (ge GoExample) GetRequest(o *Operation) string {
+	return ""
+}
+
+func (ge GoExample) GetResponse(o *Operation) string {
 	return ""
 }

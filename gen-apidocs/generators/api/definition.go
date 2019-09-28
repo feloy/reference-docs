@@ -285,6 +285,14 @@ func (d *Definition) initExample(config *Config) {
 	if err != nil {
 		panic(fmt.Sprintf("Could not Unmarshal SampleConfig yaml: %s\n", content))
 	}
+
+	path = filepath.Join(*ConfigDir, config.ExampleLocation, d.Name, d.Name+".go")
+	file = strings.Replace(strings.ToLower(path), " ", "_", -1)
+	content, err = ioutil.ReadFile(file)
+	if err != nil || len(content) <= 0 {
+		return
+	}
+	d.Sample.GoSample = string(content)
 }
 
 func (d *Definition) GetSamples() []ExampleText {

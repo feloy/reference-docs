@@ -315,6 +315,7 @@ type ExampleProvider interface {
 type EmptyExample struct{}
 type CurlExample struct{}
 type KubectlExample struct{}
+type GoExample struct{}
 
 type FieldsCategory struct {
 	Name   *string
@@ -326,6 +327,8 @@ type Resource struct {
 	Name    string `yaml:",omitempty"`
 	Version string `yaml:",omitempty"`
 	Group   string `yaml:",omitempty"`
+
+	GoImport *string `yaml:",omitempty"`
 
 	// DescriptionWarning is a warning message to show along side this resource when displaying it
 	DescriptionWarning string `yaml:"description_warning,omitempty"`
@@ -371,8 +374,9 @@ type ExampleConfig struct {
 }
 
 type SampleConfig struct {
-	Note   string `yaml:",omitempty"`
-	Sample string `yaml:",omitempty"`
+	Note     string `yaml:",omitempty"`
+	Sample   string `yaml:",omitempty"`
+	GoSample string `yaml:",omitempty"`
 }
 
 type ResourceVisitor func(resource *Resource, d *Definition)

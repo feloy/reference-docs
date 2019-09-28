@@ -124,14 +124,14 @@ func (h *DocbookWriter) WriteResource(r *api.Resource) {
 
 	dvg := fmt.Sprintf("%s %s %s", r.Name, r.Definition.Version, r.Definition.GroupDisplayName())
 	linkID := getLink(dvg)
-	fmt.Fprintf(w, "<chapter id=\"%s\"><title>%s</title>\n", linkID, dvg)
-	h.writeSample(w, r.Definition)
-
+	fmt.Fprintf(w, "<chapter id=\"%s\"><title>%s</title>\n", linkID, r.Name)
 	// GVK
 	fmt.Fprintf(w, "<informaltable>\n<tgroup cols=\"3\"><thead><row><entry>Group</entry><entry>Version</entry><entry>Kind</entry></row></thead>\n<tbody>\n")
 	fmt.Fprintf(w, "<row><entry><systemitem>%s</systemitem></entry><entry><systemitem>%s</systemitem></entry><entry><systemitem>%s</systemitem></entry></row>\n",
 		r.Definition.GroupDisplayName(), r.Definition.Version.String(), r.Name)
 	fmt.Fprintf(w, "</tbody></tgroup>\n</informaltable>\n")
+
+	h.writeSample(w, r.Definition)
 
 	if r.DescriptionWarning != "" {
 		fmt.Fprintf(w, "<warning><para>%s</para></warning>\n", a2link(r.DescriptionWarning))
@@ -163,7 +163,7 @@ func (h *DocbookWriter) WriteResource(r *api.Resource) {
 	// Inline
 	if r.Definition.Inline.Len() > 0 {
 		for _, d := range r.Definition.Inline {
-			fmt.Fprintf(w, "<sect1 id=\"%s\"><title>%s %s %s</title>\n", d.LinkID(), d.Name, d.Version, d.Group)
+			fmt.Fprintf(w, "<sect1 id=\"%s\"><title>%s</title>\n", d.LinkID(), d.Name)
 			h.writeAppearsIn(w, d)
 
 			if r.Include != nil && r.Include.Definition != nil && d.Name == *r.Include.Definition {
@@ -194,7 +194,7 @@ func (h *DocbookWriter) WriteResource(r *api.Resource) {
 	h.CurrentSection.SubSections = append(h.CurrentSection.SubSections, &item)
 
 	// Operations
-	if len(r.Definition.OperationCategories) == 0 || !h.Config.OldVersions {
+	if len(r.Definition.OperationCategories) == 0 {
 		return
 	}
 
@@ -277,7 +277,7 @@ func (h *DocbookWriter) WriteDefinition(d *api.Definition) {
 	}
 	nvg := fmt.Sprintf("%s %s %s", d.Name, d.Version, d.GroupDisplayName())
 	linkID := getLink(nvg)
-	fmt.Fprintf(f, "<sect1 id=\"%s\"><title>%s</title>\n", linkID, nvg)
+	fmt.Fprintf(f, "<sect1 id=\"%s\"><title>%s</title>\n", linkID, d.Name)
 	fmt.Fprintf(f, "<informaltable>\n<tgroup cols=\"3\"><thead><row><entry>Group</entry><entry>Version</entry><entry>Kind</entry></row></thead>\n<tbody>\n")
 	fmt.Fprintf(f, "<row><entry><systemitem>%s</systemitem></entry><entry><systemitem>%s</systemitem></entry><entry><systemitem>%s</systemitem></entry></row>\n",
 		d.GroupDisplayName(), d.Version, d.Name)
@@ -432,7 +432,11 @@ func (h *DocbookWriter) writeSample(w io.Writer, d *api.Definition) {
 
 	note := d.Sample.Note
 	for _, s := range d.GetSamples() {
-		fmt.Fprintf(w, "<example><title>%s</title><programlisting>%s</programlisting></example>\n\n", note, html.EscapeString(s.Text))
+		if s.Type == "bdocs-tab:example_go" && s.Text != "" {
+			fmt.Fprintf(w, "<example><title>%s</title><programlisting language=\"go\">%s</programlisting></example>\n\n", note, strings.TrimSpace(html.EscapeString(s.Text)))
+		} else {
+			fmt.Fprintf(w, "<example><title>%s</title><programlisting language=\"shell\">cat &lt;&lt;EOF | kubectl apply -f -\n%s\nEOF</programlisting></example>\n\n", note, strings.TrimSpace(html.EscapeString(s.Text)))
+		}
 	}
 }
 

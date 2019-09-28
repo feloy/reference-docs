@@ -91,13 +91,13 @@ dbapi-pdf-letter: gen-apidocs/generators/build/index.xml
 	 fop -pdf index-letter.pdf -fo index-letter.fo)
 
 dbapi-short: cleanapi
-	go run gen-apidocs/main.go --old-versions=false --backend=docbook --config-dir=gen-apidocs/generators --munge-groups=false
+	go run gen-apidocs/main.go --build-operations=false --old-versions=false --backend=docbook --config-dir=gen-apidocs/generators --munge-groups=false
 
 dbapi-short-pdf-a4: dbapi-short
 	(cd gen-apidocs/generators/build && \
 	 mkdir -p pdf-a4 && \
 	 cd pdf-a4 && \
-	 xsltproc --stringparam paper.type A4 -o index-a4.fo ../../../../xsl/api.xsl ../index.xml && \
+	 xsltproc --stringparam fop1.extensions 1 --stringparam paper.type A4 -o index-a4.fo ../../../../xsl/api.xsl ../index.xml && \
 	 fop -pdf index-a4.pdf -fo index-a4.fo)
 
 # NOTE: The following "sudo" may go away when we remove docker based api doc generator
