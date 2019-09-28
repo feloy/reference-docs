@@ -145,6 +145,7 @@ resource_categories:
     - name: ReplicaSet
       version: v1
       group: apps
+      goimport: "k8s.io/api/apps/v1"
       include:
         definition: ReplicaSetSpec
         file: "replicaset"
@@ -159,9 +160,43 @@ resource_categories:
     - name: Deployment
       version: v1
       group: apps
+      goimport: "k8s.io/api/apps/v1"
+      categories:
+        definition: DeploymentSpec
+        list:
+        - name: Replicas
+          fields:
+          - replicas
+          - selector
+          - template
+          - minReadySeconds
+        - name: Rollout
+          fields:
+          - strategy
+          - revisionHistoryLimit
+          - progressDeadlineSeconds
+          - paused
     - name: StatefulSet
       version: v1
       group: apps
+      goimport: "k8s.io/api/apps/v1"
+      categories:
+        definition: StatefulSetSpec
+        list:
+        - name: Replicas
+          fields:
+          - replicas
+          - selector
+          - template
+        - name: Rollout
+          fields:
+          - updateStrategy
+          - podManagementPolicy
+          - revisionHistoryLimit
+        - name: Resources
+          fields:
+          - serviceName
+          - volumeClaimTemplates
     - name: Job
       version: v1
       group: batch

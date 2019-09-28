@@ -1,4 +1,4 @@
-note: Deployment Config to run 3 nginx instances (max rollback set to 10 revisions).
+note: Deployment Config to run 3 nginx instances (max rollback set to 5 revisions).
 sample: |
   apiVersion: apps/v1
   kind: Deployment
@@ -8,6 +8,9 @@ sample: |
   spec:
     # 3 Pods should exist at all times.
     replicas: 3
+    selector:
+      matchLabels:
+        app: nginx
     template:
       metadata:
         labels:
@@ -19,3 +22,4 @@ sample: |
         - name: nginx
           # Run this image
           image: nginx:1.10
+    revisionHistoryLimit: 5

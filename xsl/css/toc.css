@@ -31,3 +31,11 @@ div#tocContent {
     }    
 
 }
+
+div#docsContent {
+    max-width: 800px;
+}
+
+dl.variablelist > dd {
+    margin-left: 24px;
+}

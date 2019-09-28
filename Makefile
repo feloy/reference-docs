@@ -93,12 +93,38 @@ dbapi-pdf-letter: gen-apidocs/generators/build/index.xml
 dbapi-short: cleanapi
 	go run gen-apidocs/main.go --build-operations=false --old-versions=false --backend=docbook --config-dir=gen-apidocs/generators --munge-groups=false
 
-dbapi-short-pdf-a4: dbapi-short
+dbapi-short-html: gen-apidocs/generators/build/index.xml
+	(cd gen-apidocs/generators/build && \
+	 mkdir -p html && \
+	 cd html && \
+     xsltproc ../../../../xsl/api-html.xsl ../index.xml)
+	 cp -R xsl/* gen-apidocs/generators/build/html/
+
+dbapi-short-pdf-a4: gen-apidocs/generators/build/index.xml
 	(cd gen-apidocs/generators/build && \
 	 mkdir -p pdf-a4 && \
 	 cd pdf-a4 && \
 	 xsltproc --stringparam fop1.extensions 1 --stringparam paper.type A4 -o index-a4.fo ../../../../xsl/api.xsl ../index.xml && \
-	 fop -pdf index-a4.pdf -fo index-a4.fo)
+	 fop -pdf index-a4.pdf -fo index-a4.fo && \
+	 rm -f index-a4.fo)
+
+dbapi-short-pdf-letter: gen-apidocs/generators/build/index.xml
+	(cd gen-apidocs/generators/build && \
+	 mkdir -p pdf-letter && \
+	 cd pdf-letter && \
+	 xsltproc --stringparam fop1.extensions 1 --stringparam paper.type USletter -o index-letter.fo ../../../../xsl/api.xsl ../index.xml && \
+	 fop -pdf index-letter.pdf -fo index-letter.fo && \
+	 rm -f index-letter.fo)
+
+dbapi-short-epub: gen-apidocs/generators/build/index.xml
+	(cd gen-apidocs/generators/build && \
+	 mkdir -p epub && \
+	 cd epub && \
+	 xsltproc --stringparam fop1.extensions 1 /usr/share/xml/docbook/stylesheet/docbook-xsl/epub/docbook.xsl ../index.xml && \
+	 zip -r k8s-api.epub * && \
+	 rm -rf META-INF OEBPS)
+
+dbapi-short-all: dbapi-short dbapi-short-html dbapi-short-pdf-a4 dbapi-short-pdf-letter dbapi-short-epub
 
 # NOTE: The following "sudo" may go away when we remove docker based api doc generator
 cleanapi:
