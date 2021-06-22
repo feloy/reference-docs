@@ -1,4 +1,4 @@
-VERSION ?= v1.21
+VERSION ?= v1.22
 
 all: kwebsite
 

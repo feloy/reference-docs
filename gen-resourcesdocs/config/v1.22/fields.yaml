@@ -312,6 +312,7 @@
     - podManagementPolicy
     - revisionHistoryLimit
     - volumeClaimTemplates
+    - minReadySeconds
 
 - definition: io.k8s.api.apps.v1.StatefulSetUpdateStrategy
   field_categories:
@@ -326,6 +327,7 @@
     - readyReplicas
     - currentReplicas
     - updatedReplicas
+    - availableReplicas
     - collisionCount
     - conditions
     - currentRevision
@@ -439,7 +441,6 @@
     - healthCheckNodePort
     - publishNotReadyAddresses
     - sessionAffinityConfig
-    - topologyKeys
     - allocateLoadBalancerNodePorts
 
 - definition: io.k8s.api.core.v1.ServicePort

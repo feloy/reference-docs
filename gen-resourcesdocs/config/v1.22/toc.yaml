@@ -22,6 +22,7 @@ parts:
     otherDefinitions:
     - PodSpec
     - Container
+    - EphemeralContainer
     - Handler
     - NodeAffinity
     - PodAffinity
@@ -29,11 +30,6 @@ parts:
     - Probe
     - PodStatus
     - PodList
-  - name: EphemeralContainers
-    group: ""
-    version: v1
-    otherDefinitions:
-    - EphemeralContainer
   - name: PodTemplate
     group: ""
     version: v1
